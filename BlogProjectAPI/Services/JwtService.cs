@@ -9,9 +9,17 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace BlogProjectAPI.Services
 {
-    public class JwtService
+    public interface IJwtService
     {
-        private const int EXPIRATION_MINUTES = 1;
+        public AuthenticationResponse CreateToken(IdentityUser user);
+        public JwtSecurityToken CreateJwtToken(Claim[] claims, SigningCredentials credentials, DateTime expiration);
+        public Claim[] CreateClaims(IdentityUser user);
+        public SigningCredentials CreateSigningCredentials();
+
+    };
+    public class JwtService : IJwtService
+    {
+        private const int EXPIRATION_MINUTES = 120;
 
         private readonly IConfiguration _configuration;
 
@@ -39,7 +47,7 @@ namespace BlogProjectAPI.Services
             };
         }
 
-        private JwtSecurityToken CreateJwtToken(Claim[] claims, SigningCredentials credentials, DateTime expiration) =>
+        public JwtSecurityToken CreateJwtToken(Claim[] claims, SigningCredentials credentials, DateTime expiration) =>
             new JwtSecurityToken(
                 _configuration["Jwt:Issuer"],
                 _configuration["Jwt:Audience"],
@@ -48,7 +56,7 @@ namespace BlogProjectAPI.Services
                 signingCredentials: credentials
             );
 
-        private Claim[] CreateClaims(IdentityUser user) =>
+        public Claim[] CreateClaims(IdentityUser user) =>
             new[] {
                 new Claim(JwtRegisteredClaimNames.Sub, _configuration["Jwt:Subject"]),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
@@ -58,7 +66,7 @@ namespace BlogProjectAPI.Services
                 new Claim(ClaimTypes.Email, user.Email)
             };
 
-        private SigningCredentials CreateSigningCredentials() =>
+        public SigningCredentials CreateSigningCredentials() =>
             new SigningCredentials(
                 new SymmetricSecurityKey(
                     Encoding.UTF8.GetBytes(_configuration["Jwt:Key"])
