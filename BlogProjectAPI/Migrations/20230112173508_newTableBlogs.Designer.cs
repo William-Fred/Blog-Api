@@ -4,14 +4,16 @@ using BlogProjectAPI.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace BlogProjectAPI.Migrations
 {
     [DbContext(typeof(BlogContext))]
-    partial class BlogContextModelSnapshot : ModelSnapshot
+    [Migration("20230112173508_newTableBlogs")]
+    partial class newTableBlogs
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -32,21 +34,16 @@ namespace BlogProjectAPI.Migrations
                     b.Property<string>("BodyContent")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateTimeOffset>("EntryDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<byte[]>("Image")
+                        .HasColumnType("varbinary(max)");
+
                     b.Property<string>("Title")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("identityUserId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<DateTime>("postedDate")
-                        .HasColumnType("datetime2");
-
                     b.HasKey("BlogId");
-
-                    b.HasIndex("identityUserId");
 
                     b.ToTable("Blogs");
                 });
@@ -179,15 +176,6 @@ namespace BlogProjectAPI.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens");
-                });
-
-            modelBuilder.Entity("BlogProjectAPI.Models.Blog", b =>
-                {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "identityUser")
-                        .WithMany()
-                        .HasForeignKey("identityUserId");
-
-                    b.Navigation("identityUser");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
